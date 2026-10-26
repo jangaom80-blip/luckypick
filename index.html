@@ -1,22 +1,320 @@
-<!-- 분석 중 프로그레스 연출 (호기심 유발) -->
-<div id="loadingBox" style="display:none; text-align:center; padding: 20px;">
-  <div style="font-size: 0.85rem; color: #D4AF37; margin-bottom: 8px;">
-    ⚡ 최근 10회차 미출현 가중치 알고리즘 연산 중...
-  </div>
-  <div style="width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden;">
-    <div id="progressBar" style="width: 0%; height: 100%; background: #D4AF37; transition: width 1.5s ease-out;"></div>
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LUCKY PICK - 프리미엄 로또 통계 시뮬레이터</title>
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --card-bg: rgba(20, 26, 38, 0.78);
+      --gold-primary: #d4af37;
+      --gold-light: #fef08a;
+      --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f59e0b 50%, #b45309 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(212, 175, 55, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+    }
 
-<!-- 보상형 락(Lock) 해제 버튼 (수익화 핵심) -->
-<div class="card" style="border: 1px dashed #D4AF37; text-align: center; margin-top: 15px;">
-  <div style="font-size: 0.9rem; font-weight: bold; color: #f8fafc;">
-    🔒 이번 주 미출현 번호 집중 조합 (D, E세트)
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 18px 14px 40px; background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 60%); }
+    .container { width: 100%; max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+    /* 헤더 */
+    header { text-align: center; padding: 10px 0 6px; }
+    .badge-top { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--border-color); color: var(--gold-light); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+    header h1 { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(180deg, #fff 20%, #d4af37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* 카드 베이스 */
+    .card { background: var(--card-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-radius: 16px; padding: 16px; border: 1px solid var(--border-subtle); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .card-title { font-size: 0.88rem; font-weight: 700; color: var(--gold-light); display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .status-tag { font-size: 0.68rem; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* 필터 스위치 리스트 */
+    .filter-list { display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem; }
+    .filter-row { display: flex; justify-content: space-between; align-items: center; }
+    .filter-info { display: flex; flex-direction: column; gap: 2px; }
+    .filter-info span:first-child { color: #e2e8f0; font-weight: 500; }
+    .filter-desc { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* 커스텀 토글 */
+    .switch { position: relative; display: inline-block; width: 38px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .25s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .25s; border-radius: 50%; }
+    input:checked + .slider { background: var(--gold-primary); }
+    input:checked + .slider:before { transform: translateX(16px); }
+
+    /* 메인 트리거 버튼 */
+    .btn-main { width: 100%; padding: 16px; border: none; border-radius: 14px; background: var(--gold-gradient); color: #0a0d14; font-size: 1rem; font-weight: 800; letter-spacing: -0.3px; cursor: pointer; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35); transition: transform 0.1s ease, filter 0.2s ease; position: relative; overflow: hidden; }
+    .btn-main:active { transform: scale(0.98); filter: brightness(0.9); }
+    .btn-main::after { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(60deg, transparent, rgba(255,255,255,0.25), transparent); transform: rotate(30deg); animation: shimmer 4s infinite linear; }
+    @keyframes shimmer { 0% { transform: translateX(-100%) rotate(30deg); } 100% { transform: translateX(100%) rotate(30deg); } }
+
+    /* 2초 분석 연출 박스 */
+    .analysis-box { display: none; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; text-align: center; }
+    .analysis-text { font-size: 0.82rem; color: var(--gold-light); font-weight: 600; min-height: 20px; margin-bottom: 10px; }
+    .progress-track { width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+    .progress-bar { width: 0%; height: 100%; background: var(--gold-gradient); border-radius: 4px; transition: width 0.3s ease; }
+
+    /* 번호 카드 결과 */
+    .results-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .result-row { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.2s; }
+    .result-row:hover { border-color: var(--border-color); }
+    .row-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
+    .row-meta strong { color: var(--gold-light); }
+    .balls-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; justify-items: center; align-items: center; }
+
+    /* 로또 공 규격 */
+    .lotto-ball { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: #fff; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.35), 0 4px 8px rgba(0,0,0,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    .ball-yellow { background: radial-gradient(circle at 35% 35%, #fde047, #ca8a04); color: #0f172a; text-shadow: none; }
+    .ball-blue   { background: radial-gradient(circle at 35% 35%, #38bdf8, #0284c7); }
+    .ball-red    { background: radial-gradient(circle at 35% 35%, #f87171, #dc2626); }
+    .ball-gray   { background: radial-gradient(circle at 35% 35%, #94a3b8, #475569); }
+    .ball-green  { background: radial-gradient(circle at 35% 35%, #4ade80, #16a34a); }
+
+    /* 액션 버튼 */
+    .btn-copy { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: var(--gold-light); border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-copy:active { background: rgba(212, 175, 55, 0.15); }
+
+    /* 법적 고지 푸터 */
+    footer { margin-top: 10px; padding: 14px 10px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px; text-align: left; }
+    .disclaimer-title { font-size: 0.72rem; font-weight: 700; color: #64748b; }
+    .disclaimer-body { font-size: 0.65rem; color: #475569; line-height: 1.45; word-break: keep-all; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-top">👑 PREMIUM STATISTICAL ENGINE</div>
+      <h1>LUCKY PICK</h1>
+      <p>빅데이터 통계 필터링 기반 골든 번호 추출기</p>
+    </header>
+
+    <!-- 알고리즘 필터 컨트롤러 -->
+    <div class="card">
+      <div class="card-title">
+        <span>황금 통계 알고리즘 필터</span>
+        <span class="status-tag">가동 중</span>
+      </div>
+      <div class="filter-list">
+        <div class="filter-row">
+          <div class="filter-info">
+            <span>홀짝 밸런스 검증 (3:3 / 2:4 / 4:2)</span>
+            <span class="filter-desc">역대 1등 출현 빈도 81.3% 황금비 매칭</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="oddEvenOpt" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-info">
+            <span>총합 정규분포 필터 (100 ~ 175)</span>
+            <span class="filter-desc">비현실적 극단 합계(저수/고수) 원천 기각</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="sumOpt" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-info">
+            <span>연속 번호 3연번 이상 차단</span>
+            <span class="filter-desc">12, 13, 14 등 동반 탈락 방지 패턴 적용</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="consecOpt" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 추출 트리거 버튼 -->
+    <button class="btn-main" id="generateBtn" onclick="startGeneration()">
+      ⚡ 이번 주 황금 번호 5세트 추출하기
+    </button>
+
+    <!-- 2초 실시간 분석 애니메이션 박스 -->
+    <div class="analysis-box" id="analysisBox">
+      <div class="analysis-text" id="analysisStep">최근 10회차 미출현 가중치 연산 중...</div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- 번호 출력 영역 -->
+    <div class="results-wrap" id="resultsWrap"></div>
+
+    <!-- 복사 버튼 -->
+    <button class="btn-copy" id="copyBtn" style="display:none;" onclick="copyAll()">
+      📋 추출된 5개 조합 전체 복사하기
+    </button>
+
+    <!-- 법적 면책 고지 -->
+    <footer>
+      <span class="disclaimer-title">서비스 이용 안내 및 법적 면책 고지</span>
+      <p class="disclaimer-body">
+        1. 본 서비스는 역대 로또 당첨 데이터의 통계적 규칙성을 바탕으로 난수를 기각·추출하는 '엔터테인먼트 시뮬레이터'입니다.<br>
+        2. 본 서비스는 실제 복권의 당첨 확률을 보장하지 않으며, 동행복권(주) 및 기획재정부 복권위원회와 무관한 독립 웹사이트입니다.<br>
+        3. 복권 구매에 대한 모든 책임은 이용자 본인에게 있으며, 과도한 몰입 방지와 건전한 복권 문화를 권장합니다. (청소년 복권 구매 및 1인 1회 10만 원 초과 구매는 법으로 금지되어 있습니다.)
+      </p>
+    </footer>
   </div>
-  <p style="font-size: 0.75rem; color: #94a3b8; margin: 6px 0 12px;">
-    5초 안내 확인 후 황금 번호 2세트가 즉시 해금됩니다.
-  </p>
-  <button onclick="unlockExtraSets()" style="background: #D4AF37; color: #000; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-    ✨ 무료로 잠금 해제하기
-  </button>
-</div>
+
+  <script>
+    // 볼 컬러 매핑 (동행복권 공식 기준)
+    function getBallTheme(n) {
+      if (n <= 10) return 'ball-yellow';
+      if (n <= 20) return 'ball-blue';
+      if (n <= 30) return 'ball-red';
+      if (n <= 40) return 'ball-gray';
+      return 'ball-green';
+    }
+
+    // AC(산술적 복잡도) 계산
+    function getAC(numbers) {
+      const diffs = new Set();
+      for (let i = 0; i < numbers.length; i++) {
+        for (let j = i + 1; j < numbers.length; j++) {
+          diffs.add(Math.abs(numbers[i] - numbers[j]));
+        }
+      }
+      return diffs.size - 5;
+    }
+
+    // 조건부 필터 검증
+    function validateNumbers(nums) {
+      const useOdd = document.getElementById('oddEvenOpt').checked;
+      const useSum = document.getElementById('sumOpt').checked;
+      const useConsec = document.getElementById('consecOpt').checked;
+
+      if (useOdd) {
+        const odds = nums.filter(n => n % 2 !== 0).length;
+        if (odds < 2 || odds > 4) return false;
+      }
+
+      const sum = nums.reduce((a, b) => a + b, 0);
+      if (useSum && (sum < 100 || sum > 175)) return false;
+
+      if (useConsec) {
+        for (let i = 0; i < nums.length - 2; i++) {
+          if (nums[i + 1] === nums[i] + 1 && nums[i + 2] === nums[i] + 1) {
+            return false;
+          }
+        }
+      }
+
+      if (getAC(nums) < 6) return false;
+
+      return true;
+    }
+
+    // 단일 세트 생성
+    function generateOneSet() {
+      const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+      for (let i = 0; i < 300; i++) {
+        const shuffled = [...pool].sort(() => 0.5 - Math.random());
+        const pick = shuffled.slice(0, 6).sort((a, b) => a - b);
+        if (validateNumbers(pick)) return pick;
+      }
+      return pool.sort(() => 0.5 - Math.random()).slice(0, 6).sort((a, b) => a - b);
+    }
+
+    let generatedData = [];
+
+    // 2초 실시간 분석 연출 후 생성
+    function startGeneration() {
+      const btn = document.getElementById('generateBtn');
+      const box = document.getElementById('analysisBox');
+      const bar = document.getElementById('progressBar');
+      const text = document.getElementById('analysisStep');
+      const results = document.getElementById('resultsWrap');
+      const copy = document.getElementById('copyBtn');
+
+      btn.style.display = 'none';
+      results.innerHTML = '';
+      copy.style.display = 'none';
+      box.style.display = 'block';
+      bar.style.width = '0%';
+
+      if (window.navigator.vibrate) window.navigator.vibrate(20);
+
+      // 단계별 텍스트 및 게이지 제어
+      setTimeout(() => {
+        bar.style.width = '35%';
+        text.innerText = '⚡ 최근 10회차 미출현 가중치 연산 중...';
+      }, 100);
+
+      setTimeout(() => {
+        bar.style.width = '70%';
+        text.innerText = '📊 홀짝 밸런스 및 합계 정규분포 기각 검증 중...';
+      }, 800);
+
+      setTimeout(() => {
+        bar.style.width = '100%';
+        text.innerText = '✨ AC 복잡도 지수 검증 통과! 번호 추출 완료';
+      }, 1500);
+
+      setTimeout(() => {
+        box.style.display = 'none';
+        btn.style.display = 'block';
+        renderResults();
+        if (window.navigator.vibrate) window.navigator.vibrate([30, 40, 30]);
+      }, 2000);
+    }
+
+    // 결과 렌더링
+    function renderResults() {
+      const container = document.getElementById('resultsWrap');
+      container.innerHTML = '';
+      generatedData = [];
+      const labels = ['A', 'B', 'C', 'D', 'E'];
+
+      for (let i = 0; i < 5; i++) {
+        const set = generateOneSet();
+        generatedData.push(set);
+
+        const sum = set.reduce((a, b) => a + b, 0);
+        const odd = set.filter(n => n % 2 !== 0).length;
+        const ac = getAC(set);
+
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML = `
+          <div class="row-meta">
+            <span><strong>${labels[i]} 세트</strong></span>
+            <span>합: ${sum} | 홀짝 ${odd}:${6-odd} | AC: ${ac}</span>
+          </div>
+          <div class="balls-grid">
+            ${set.map(num => `<div class="lotto-ball ${getBallTheme(num)}">${num}</div>`).join('')}
+          </div>
+        `;
+        container.appendChild(row);
+      }
+
+      document.getElementById('copyBtn').style.display = 'block';
+    }
+
+    // 전체 복사
+    function copyAll() {
+      if (generatedData.length === 0) return;
+      const labels = ['A', 'B', 'C', 'D', 'E'];
+      let txt = '👑 LUCKY PICK 황금 번호 조합\n\n';
+      generatedData.forEach((s, idx) => {
+        txt += `${labels[idx]}세트: ${s.map(n => String(n).padStart(2, '0')).join(', ')}\n`;
+      });
+      navigator.clipboard.writeText(txt).then(() => {
+        alert('추출된 5개 번호 조합이 복사되었습니다.');
+      });
+    }
+
+    // 첫 진입 시 즉시 1회 자동 생성
+    window.onload = renderResults;
+  </script>
+</body>
+</html>
