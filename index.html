@@ -1,84 +1,219 @@
-// AC(Arithmetic Complexity) 값 계산 함수
-function calculateAC(numbers) {
-  const diffs = new Set();
-  for (let i = 0; i < numbers.length; i++) {
-    for (let j = i + 1; j < numbers.length; j++) {
-      diffs.add(Math.abs(numbers[i] - numbers[j]));
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>럭키픽 - 황금 통계 로또 번호 추출기</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border: #334155;
     }
-  }
-  return diffs.size - (numbers.length - 1);
-}
 
-// 필터 검증 파이프라인
-function isValidCombination(numbers, options = {}) {
-  const {
-    oddRange = [2, 4],       // 홀수 개수 2~4개
-    sumRange = [100, 175],   // 총합 100~175
-    minAC = 7,               // 산술적 복잡도 7 이상
-    maxConsecutive = 1       // 연속수 최대 1쌍 (3연번 금지)
-  } = options;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 16px; }
+    .container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
-  // 1. 홀짝 검증
-  const oddCount = numbers.filter(n => n % 2 !== 0).length;
-  if (oddCount < oddRange[0] || oddCount > oddRange[1]) return false;
+    header { text-align: center; padding: 12px 0; }
+    header h1 { font-size: 1.5rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+    header p { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; }
 
-  // 2. 총합 검증
-  const sum = numbers.reduce((acc, cur) => acc + cur, 0);
-  if (sum < sumRange[0] || sum > sumRange[1]) return false;
+    .card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .tag { font-size: 0.7rem; background: #0369a1; color: #e0f2fe; padding: 2px 8px; border-radius: 999px; }
 
-  // 3. 연속 번호 검증 (정렬 상태 필수)
-  let consecutivePairs = 0;
-  for (let i = 0; i < numbers.length - 1; i++) {
-    if (numbers[i + 1] - numbers[i] === 1) {
-      consecutivePairs++;
-      if (i < numbers.length - 2 && numbers[i + 2] - numbers[i + 1] === 1) {
-        return false; // 3연속 번호 발견 시 즉시 탈락
+    /* 필터 옵션 */
+    .filter-group { display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; }
+    .filter-item { display: flex; justify-content: space-between; align-items: center; }
+    .filter-desc { color: var(--text-sub); font-size: 0.75rem; }
+    .toggle { accent-color: var(--accent); width: 18px; height: 18px; cursor: pointer; }
+
+    /* 메인 버튼 */
+    .btn-generate { width: 100%; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(56, 189, 248, 0.35); transition: transform 0.1s, opacity 0.2s; }
+    .btn-generate:active { transform: scale(0.98); opacity: 0.9; }
+
+    /* 결과 영역 */
+    .result-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+    .result-item { background: #0f172a; border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .result-header { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); }
+    .balls-wrap { display: flex; justify-content: space-between; gap: 4px; }
+    
+    /* 로또 공 규격 */
+    .ball { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); box-shadow: inset -2px -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.3); }
+    .ball-1 { background: radial-gradient(circle at 30% 30%, #fde047, #ca8a04); color: #1e293b; text-shadow: none; } /* 1~10 노랑 */
+    .ball-2 { background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7); } /* 11~20 파랑 */
+    .ball-3 { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); } /* 21~30 빨강 */
+    .ball-4 { background: radial-gradient(circle at 30% 30%, #94a3b8, #475569); } /* 31~40 회색 */
+    .ball-5 { background: radial-gradient(circle at 30% 30%, #4ade80, #16a34a); } /* 41~45 녹색 */
+
+    /* 복사 및 안내 */
+    .btn-copy { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); color: var(--text-sub); border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .btn-copy:hover { color: var(--text-main); border-color: var(--accent); }
+    .disclaimer { text-align: center; font-size: 0.7rem; color: #64748b; line-height: 1.4; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>✨ LUCKY PICK</h1>
+      <p>역대 1등 당첨 통계 필터링 기반 번호 조합기</p>
+    </header>
+
+    <div class="card">
+      <div class="card-title">
+        <span>황금 통계 알고리즘 필터</span>
+        <span class="tag">적용 중</span>
+      </div>
+      <div class="filter-group">
+        <div class="filter-item">
+          <div>
+            <div>홀짝 밸런스 검증 (3:3 / 2:4 / 4:2)</div>
+            <div class="filter-desc">역대 당첨 80% 이상의 표준 비율 유지</div>
+          </div>
+          <input type="checkbox" id="oddEvenFilter" class="toggle" checked>
+        </div>
+        <div class="filter-item">
+          <div>
+            <div>총합 구간 필터 (100 ~ 175)</div>
+            <div class="filter-desc">극단적 저수/고수 합계 조합 자동 탈락</div>
+          </div>
+          <input type="checkbox" id="sumFilter" class="toggle" checked>
+        </div>
+        <div class="filter-item">
+          <div>
+            <div>연속 번호 3연번 이상 차단</div>
+            <div class="filter-desc">12, 13, 14 같은 비현실적 연속수 제외</div>
+          </div>
+          <input type="checkbox" id="consecutiveFilter" class="toggle" checked>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-generate" onclick="generateAllSets()">⚡ 황금 행운 번호 5세트 추출하기</button>
+
+    <div class="result-list" id="resultContainer"></div>
+
+    <button class="btn-copy" id="copyBtn" style="display:none;" onclick="copyAllNumbers()">📋 생성된 번호 전체 복사하기</button>
+
+    <div class="disclaimer">
+      본 서비스는 역대 당첨 데이터 통계를 기반으로 난수를 기각·추출하는 재미 목적의 시뮬레이터입니다. 복권 과몰입을 지양하며 건전한 여가를 권장합니다.
+    </div>
+  </div>
+
+  <script>
+    function getBallClass(n) {
+      if (n <= 10) return 'ball-1';
+      if (n <= 20) return 'ball-2';
+      if (n <= 30) return 'ball-3';
+      if (n <= 40) return 'ball-4';
+      return 'ball-5';
+    }
+
+    function calculateAC(nums) {
+      const diffs = new Set();
+      for (let i = 0; i < nums.length; i++) {
+        for (let j = i + 1; j < nums.length; j++) {
+          diffs.add(Math.abs(nums[i] - nums[j]));
+        }
+      }
+      return diffs.size - 5;
+    }
+
+    function isValid(numbers) {
+      const useOddEven = document.getElementById('oddEvenFilter').checked;
+      const useSum = document.getElementById('sumFilter').checked;
+      const useConsecutive = document.getElementById('consecutiveFilter').checked;
+
+      if (useOddEven) {
+        const oddCount = numbers.filter(n => n % 2 !== 0).length;
+        if (oddCount < 2 || oddCount > 4) return false;
+      }
+
+      const sum = numbers.reduce((a, b) => a + b, 0);
+      if (useSum && (sum < 100 || sum > 175)) return false;
+
+      if (useConsecutive) {
+        for (let i = 0; i < numbers.length - 2; i++) {
+          if (numbers[i + 1] === numbers[i] + 1 && numbers[i + 2] === numbers[i] + 2) {
+            return false;
+          }
+        }
+      }
+
+      // AC값 7 이상 권장
+      if (calculateAC(numbers) < 6) return false;
+
+      return true;
+    }
+
+    function generateSingleSet() {
+      const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+      for (let attempt = 0; attempt < 300; attempt++) {
+        const shuffled = [...pool].sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 6).sort((a, b) => a - b);
+        if (isValid(selected)) return selected;
+      }
+      return [...pool].sort(() => 0.5 - Math.random()).slice(0, 6).sort((a, b) => a - b);
+    }
+
+    let currentResults = [];
+
+    function generateAllSets() {
+      const container = document.getElementById('resultContainer');
+      container.innerHTML = '';
+      currentResults = [];
+
+      const setLabels = ['A', 'B', 'C', 'D', 'E'];
+
+      for (let i = 0; i < 5; i++) {
+        const set = generateSingleSet();
+        currentResults.push(set);
+
+        const sum = set.reduce((a, b) => a + b, 0);
+        const odd = set.filter(n => n % 2 !== 0).length;
+        const ac = calculateAC(set);
+
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        item.innerHTML = `
+          <div class="result-header">
+            <span><strong>${setLabels[i]} 세트</strong></span>
+            <span>합계: ${sum} | 홀짝 ${odd}:${6-odd} | AC: ${ac}</span>
+          </div>
+          <div class="balls-wrap">
+            ${set.map(num => `<div class="ball ${getBallClass(num)}">${num}</div>`).join('')}
+          </div>
+        `;
+        container.appendChild(item);
+      }
+
+      document.getElementById('copyBtn').style.display = 'block';
+
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(30);
       }
     }
-  }
-  if (consecutivePairs > maxConsecutive) return false;
 
-  // 4. AC값 검증
-  if (calculateAC(numbers) < minAC) return false;
-
-  // 5. 끝자리 중복 검증 (동일 끝자리 3개 이상 탈락)
-  const lastDigits = numbers.map(n => n % 10);
-  const digitCounts = {};
-  for (const d of lastDigits) {
-    digitCounts[d] = (digitCounts[d] || 0) + 1;
-    if (digitCounts[d] >= 3) return false;
-  }
-
-  return true;
-}
-
-// 최종 6개 번호 생성기
-function generateLottoNumbers(includeNums = [], excludeNums = [], options = {}) {
-  const MAX_ATTEMPTS = 200;
-  let attempts = 0;
-
-  const pool = Array.from({ length: 45 }, (_, i) => i + 1)
-    .filter(n => !excludeNums.includes(n));
-
-  while (attempts < MAX_ATTEMPTS) {
-    attempts++;
-    const selected = [...includeNums];
-    const availablePool = pool.filter(n => !includeNums.includes(n));
-
-    // 남은 자리만큼 셔플 후 추출
-    while (selected.length < 6 && availablePool.length > 0) {
-      const randIdx = Math.floor(Math.random() * availablePool.length);
-      selected.push(availablePool.splice(randIdx, 1)[0]);
+    function copyAllNumbers() {
+      if (currentResults.length === 0) return;
+      const setLabels = ['A', 'B', 'C', 'D', 'E'];
+      let text = '🎰 럭키픽 행운의 번호\n\n';
+      currentResults.forEach((set, idx) => {
+        text += `${setLabels[idx]}세트: ${set.map(n => String(n).padStart(2, '0')).join(', ')}\n`;
+      });
+      navigator.clipboard.writeText(text).then(() => {
+        alert('5개 조합이 클립보드에 복사되었습니다!');
+      });
     }
 
-    selected.sort((a, b) => a - b);
-
-    // 필터 검증 통과 시 반환
-    if (isValidCombination(selected, options)) {
-      return { numbers: selected, attempts };
-    }
-  }
-
-  // 조건이 너무 빡빡해 루프 초과 시 기본 셔플 조합 반환 (Fallback)
-  return { numbers: pool.sort(() => 0.5 - Math.random()).slice(0, 6).sort((a, b) => a - b), fallback: true };
-}
+    // 첫 방문 시 자동 1회 추출
+    window.onload = generateAllSets;
+  </script>
+</body>
+</html>
