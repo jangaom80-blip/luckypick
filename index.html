@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>STATLAB 로또 6/45 AI 통계 번호 추출기</title>
+
+  <!-- 메타태그 (카카오톡/SNS 공유 카드) -->
+  <meta property="og:title" content="STATLAB 로또 6/45 AI 통계 번호 추출기">
+  <meta property="og:description" content="역대 1등 당첨 통계(합계·홀짝·AC값) 기반 5조합 3초 무료 추출">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jangaom80-blip.github.io/luckypick/">
+
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
     :root {
@@ -20,11 +27,28 @@
     body { background-color: var(--bg-dark); color: var(--text-white); padding: 18px 14px 40px; -webkit-font-smoothing: antialiased; }
     .container { max-width: 480px; margin: 0 auto; }
 
-    /* 헤더 및 컨트롤 */
-    header { text-align: center; margin-bottom: 18px; }
+    /* 헤더 */
+    header { text-align: center; margin-bottom: 14px; }
     .badge-top { display: inline-block; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--primary-gold); font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
     h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 4px; }
     .sub-title { font-size: 12px; color: var(--text-sub); }
+
+    /* 쿠팡 파트너스 필수 대가성 문구 (최상단 고시인성 규격) */
+    .coupang-disclosure-top {
+      background: rgba(245, 158, 11, 0.16);
+      border: 1.5px solid #fbbf24;
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .coupang-disclosure-top p {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fde68a;
+      line-height: 1.45;
+      margin: 0;
+    }
 
     .btn-generate {
       width: 100%;
@@ -71,11 +95,11 @@
       color: #ffffff;
       box-shadow: inset -2px -2px 5px rgba(0,0,0,0.4), 0 3px 6px rgba(0,0,0,0.3);
     }
-    .ball-y { background: radial-gradient(circle at 30% 30%, #fde047, #d97706); color: #000; } /* 1~10 노랑 */
-    .ball-b { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8); } /* 11~20 파랑 */
-    .ball-r { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); } /* 21~30 빨강 */
-    .ball-g { background: radial-gradient(circle at 30% 30%, #94a3b8, #475569); } /* 31~40 회색 */
-    .ball-e { background: radial-gradient(circle at 30% 30%, #4ade80, #15803d); } /* 41~45 초록 */
+    .ball-y { background: radial-gradient(circle at 30% 30%, #fde047, #d97706); color: #000; }
+    .ball-b { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8); }
+    .ball-r { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); }
+    .ball-g { background: radial-gradient(circle at 30% 30%, #94a3b8, #475569); }
+    .ball-e { background: radial-gradient(circle at 30% 30%, #4ade80, #15803d); }
 
     /* 복사하기 버튼 */
     .btn-copy-all {
@@ -101,15 +125,15 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 16px 14px 14px;
+      padding: 16px 14px;
       margin-top: 10px;
     }
     .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
     .section-title { font-size: 14px; font-weight: 900; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
     .badge-rcmd { font-size: 10px; font-weight: 800; color: var(--primary-gold); background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 6px; border-radius: 4px; }
-    .section-desc { font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; }
+    .section-desc { font-size: 11.5px; color: var(--text-sub); margin-bottom: 12px; }
 
-    .item-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .item-list { display: flex; flex-direction: column; gap: 8px; }
     .item-row {
       background: #0f1522;
       border: 1px solid #232c3f;
@@ -124,7 +148,7 @@
     .item-left { display: flex; align-items: center; gap: 10px; }
     .item-icon { font-size: 22px; flex-shrink: 0; }
     .item-text strong { display: block; font-size: 12.5px; font-weight: 800; color: #f1f5f9; margin-bottom: 2px; }
-    .item-text span { font-size: 11px; color: var(--text-muted); display: block; }
+    .item-text span { font-size: 11px; color: var(--text-sub); display: block; }
     .btn-go {
       background: #1e283d;
       color: #cbd5e1;
@@ -137,14 +161,6 @@
       align-items: center;
     }
     .item-row:hover .btn-go { background: var(--primary-gold); color: #000; }
-
-    .coupang-notice {
-      font-size: 10px;
-      color: #475569;
-      text-align: center;
-      line-height: 1.4;
-      margin-top: 8px;
-    }
 
     /* 복사 완료 시 뜨는 행운 팝업 모달 */
     .modal-overlay {
@@ -164,7 +180,7 @@
       border-radius: 20px;
       max-width: 350px;
       width: 100%;
-      padding: 22px 18px 16px;
+      padding: 22px 18px 18px;
       text-align: center;
       box-shadow: 0 16px 40px rgba(0,0,0,0.6);
       animation: popAnim 0.22s ease-out;
@@ -202,11 +218,18 @@
     .btn-modal-close {
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-sub);
       font-size: 12px;
       padding: 6px;
       cursor: pointer;
       text-decoration: underline;
+    }
+    .modal-disclosure {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fde68a;
+      line-height: 1.4;
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -217,6 +240,11 @@
       <h1>로또 6/45 AI 통계 번호 추출</h1>
       <p class="sub-title">역대 당첨 통계·합계·홀짝 비율 기반 5개 조합 자동 생성</p>
     </header>
+
+    <!-- 쿠팡 파트너스 필수 대가성 문구 (첫 부분 최상단 배치 · 본문보다 큰 고시인성 표기) -->
+    <div class="coupang-disclosure-top">
+      <p>이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </div>
 
     <button type="button" class="btn-generate" onclick="generateAllSets()">
       🎲 이번 주 AI 추천 5조합 새로 추출하기
@@ -263,10 +291,6 @@
           <span class="btn-go">보러가기 ›</span>
         </a>
       </div>
-
-      <p class="coupang-notice">
-        이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-      </p>
     </div>
   </div>
 
@@ -297,7 +321,7 @@
         그냥 번호만 쓸게요 (닫기)
       </button>
 
-      <p class="coupang-notice" style="margin-top:12px;">
+      <p class="modal-disclosure">
         이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
     </div>
@@ -407,8 +431,3 @@
   </script>
 </body>
 </html>
-<!-- index.html의 <head> 태그 안에 추가하면 좋은 코드 -->
-<meta property="og:title" content="STATLAB 로또 6/45 AI 통계 번호 추출기">
-<meta property="og:description" content="역대 1등 당첨 통계(합계·홀짝·AC값) 기반 5조합 3초 무료 추출">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://jangaom80-blip.github.io/luckypick/">
