@@ -120,7 +120,7 @@
     }
     .btn-copy-all:active { background: #1e293b; color: #fff; }
 
-    /* 하단 쿠팡 파트너스 아이템 영역 */
+    /* 하단 쿠팡 파트너스 아이템 + 실시간 검색 영역 */
     .coupang-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -132,6 +132,164 @@
     .section-title { font-size: 14px; font-weight: 900; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
     .badge-rcmd { font-size: 10px; font-weight: 800; color: var(--primary-gold); background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 6px; border-radius: 4px; }
     .section-desc { font-size: 11.5px; color: var(--text-sub); margin-bottom: 12px; }
+
+    /* 실시간 상품 검색 바 */
+    .search-box-wrap {
+      background: #0b111e;
+      border: 1.5px solid #f59e0b;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .search-box-label {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #fde68a;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .search-input-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 0;
+      background: #151e30;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13.5px;
+      font-weight: 700;
+      outline: none;
+    }
+    .search-input:focus { border-color: #fbbf24; }
+    .search-input::placeholder { color: #64748b; font-weight: 500; }
+    .btn-search {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #0b0f19;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-search:active { transform: scale(0.97); }
+
+    /* 추천 키워드 칩 */
+    .keyword-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .chip-btn {
+      background: #1a2234;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .chip-btn:active { background: #f59e0b; color: #0b0f19; }
+
+    /* 실시간 API 검색 결과 리스트 */
+    #searchResultArea {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #2e3b56;
+    }
+    .search-status-msg {
+      text-align: center;
+      font-size: 12.5px;
+      color: #fde68a;
+      padding: 14px 6px;
+      font-weight: 700;
+    }
+    .search-result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .api-prod-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #172033;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      padding: 9px;
+      text-decoration: none;
+      transition: transform 0.15s ease;
+    }
+    .api-prod-card:active { transform: scale(0.98); background: #1e2a42; }
+    .api-prod-thumb {
+      width: 58px;
+      height: 58px;
+      min-width: 58px;
+      border-radius: 8px;
+      background: #fff;
+      object-fit: contain;
+      padding: 2px;
+    }
+    .api-prod-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .api-prod-badges {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 3px;
+    }
+    .api-badge-rocket {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .api-badge-free {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .api-prod-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+    .api-prod-price {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #fbbf24;
+    }
+    .api-prod-go {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #0b0f19;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 7px 9px;
+      border-radius: 7px;
+      white-space: nowrap;
+    }
 
     .item-list { display: flex; flex-direction: column; gap: 8px; }
     .item-row {
@@ -258,13 +416,32 @@
       📋 추출된 5개 조합 전체 복사하기
     </button>
 
-    <!-- 하단 2종 상품 고정 박스 (쿠팡 파트너스 링크 직접 연결) -->
+    <!-- 하단 쿠팡 파트너스 실시간 검색 + 2종 상품 고정 박스 -->
     <div class="coupang-section">
       <div class="section-head">
         <div class="section-title">🍀 1등 기운을 담는 행운의 아이템</div>
         <span class="badge-rcmd">추천</span>
       </div>
-      <div class="section-desc">지갑 속 행운 부적과 번호 보관 추천 굿즈 모음</div>
+      <div class="section-desc">행운 부적 · 번호 보관 굿즈 및 쿠팡 실시간 최저가 검색</div>
+
+      <!-- 쿠팡 실시간 상품 검색 박스 -->
+      <div class="search-box-wrap">
+        <div class="search-box-label">🔍 행운 아이템 · 생필품 쿠팡 실시간 최저가 검색</div>
+        <div class="search-input-row">
+          <input type="text" id="coupangKeyword" class="search-input" placeholder="쿠팡 상품 검색 (예: 24K순금카드, 황금지갑)" onkeypress="if(event.key==='Enter') searchCoupangProducts()">
+          <button type="button" class="btn-search" onclick="searchCoupangProducts()">🔍 검색</button>
+        </div>
+        <div class="keyword-chips">
+          <button type="button" class="chip-btn" onclick="quickSearch('24K순금카드')">#24K순금카드</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('행운부적')">#행운부적</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('황금지갑')">#황금지갑</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('금전수화분')">#금전수화분</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('복권지갑')">#복권지갑</button>
+        </div>
+
+        <!-- 실시간 API 검색 결과 출력 영역 -->
+        <div id="searchResultArea"></div>
+      </div>
 
       <div class="item-list">
         <!-- 1번 상품: 24K 순금 2달러 -->
@@ -328,7 +505,61 @@
   </div>
 
   <script>
+    const WORKER_URL = "https://coupang-api.aom100.workers.dev";
     let currentSets = [];
+
+    function quickSearch(word) {
+      document.getElementById('coupangKeyword').value = word;
+      searchCoupangProducts();
+    }
+
+    async function searchCoupangProducts() {
+      const keyword = document.getElementById('coupangKeyword').value.trim();
+      const resultArea = document.getElementById('searchResultArea');
+
+      if (!keyword) {
+        alert('검색할 상품명을 입력해주세요!');
+        document.getElementById('coupangKeyword').focus();
+        return;
+      }
+
+      resultArea.style.display = 'block';
+      resultArea.innerHTML = `<div class="search-status-msg">🔍 쿠팡에서 '${keyword}' 실시간 최저가를 찾는 중...</div>`;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/?keyword=${encodeURIComponent(keyword)}&limit=6`);
+        const json = await res.json();
+
+        const products = json?.data?.productData || [];
+        if (json.rCode !== "0" || products.length === 0) {
+          resultArea.innerHTML = `<div class="search-status-msg" style="color:#94a3b8;">검색 결과가 없습니다. 다른 키워드로 검색해 보세요.</div>`;
+          return;
+        }
+
+        let html = `<div class="search-result-list">`;
+        products.forEach(item => {
+          const priceStr = Number(item.productPrice || 0).toLocaleString() + '원';
+          const rocketBadge = item.isRocket ? `<span class="api-badge-rocket">🚀 로켓배송</span>` : '';
+          const freeBadge = item.isFreeShipping ? `<span class="api-badge-free">무료배송</span>` : '';
+
+          html += `
+            <a href="${item.productUrl}" target="_blank" class="api-prod-card">
+              <img src="${item.productImage}" alt="" class="api-prod-thumb" onerror="this.style.display='none'">
+              <div class="api-prod-body">
+                <div class="api-prod-badges">${rocketBadge}${freeBadge}</div>
+                <div class="api-prod-name">${item.productName}</div>
+                <div class="api-prod-price">${priceStr}</div>
+              </div>
+              <div class="api-prod-go">최저가 ›</div>
+            </a>
+          `;
+        });
+        html += `</div>`;
+        resultArea.innerHTML = html;
+      } catch (err) {
+        resultArea.innerHTML = `<div class="search-status-msg" style="color:#f87171;">일시적인 통신 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</div>`;
+      }
+    }
 
     // 볼 색상 클래스 결정
     function getBallClass(num) {
