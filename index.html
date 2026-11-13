@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>STATLAB 로또 6/45 AI 통계 번호 추출기</title>
+  <meta name="description" content="역대 로또 1등 당첨 통계(총합계, 홀짝 비율, 산술복잡도 AC값) 기반 AI 추천 5조합 3초 무료 추출기">
+  <meta name="keywords" content="로또 번호 생성기, 로또 AI 추천번호, 로또 통계 추출기, 로또 AC값 계산, 무료 로또 번호">
 
   <!-- 메타태그 (카카오톡/SNS 공유 카드) -->
   <meta property="og:title" content="STATLAB 로또 6/45 AI 통계 번호 추출기">
   <meta property="og:description" content="역대 1등 당첨 통계(합계·홀짝·AC값) 기반 5조합 3초 무료 추출">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://jangaom80-blip.github.io/luckypick/">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?auto=format&fit=crop&w=1200&q=80">
 
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
@@ -27,13 +30,12 @@
     body { background-color: var(--bg-dark); color: var(--text-white); padding: 18px 14px 40px; -webkit-font-smoothing: antialiased; }
     .container { max-width: 480px; margin: 0 auto; }
 
-    /* 헤더 */
     header { text-align: center; margin-bottom: 14px; }
     .badge-top { display: inline-block; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--primary-gold); font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
     h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 4px; }
     .sub-title { font-size: 12px; color: var(--text-sub); }
 
-    /* 쿠팡 파트너스 필수 대가성 문구 (최상단 고시인성 규격) */
+    /* 쿠팡 파트너스 필수 대가성 문구 (최상단 배치) */
     .coupang-disclosure-top {
       background: rgba(245, 158, 11, 0.16);
       border: 1.5px solid #fbbf24;
@@ -69,7 +71,6 @@
     }
     .btn-generate:active { transform: scale(0.98); }
 
-    /* 로또 5세트 카드 리스트 */
     .set-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .set-card {
       background: var(--card-bg);
@@ -81,7 +82,6 @@
     .set-name { font-size: 13.5px; font-weight: 900; color: #f8fafc; }
     .set-stats { font-size: 11px; color: var(--text-sub); font-weight: 600; }
 
-    /* 번호 볼 공 디자인 */
     .ball-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
     .lotto-ball {
       width: 40px;
@@ -101,7 +101,6 @@
     .ball-g { background: radial-gradient(circle at 30% 30%, #94a3b8, #475569); }
     .ball-e { background: radial-gradient(circle at 30% 30%, #4ade80, #15803d); }
 
-    /* 복사하기 버튼 */
     .btn-copy-all {
       width: 100%;
       background: #182030;
@@ -116,22 +115,22 @@
       justify-content: center;
       align-items: center;
       gap: 6px;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
     .btn-copy-all:active { background: #1e293b; color: #fff; }
 
-    /* 하단 쿠팡 파트너스 아이템 + 실시간 검색 영역 */
+    /* 쿠팡 파트너스 실시간 검색 + 2종 상품 고정 박스 */
     .coupang-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 16px 14px;
-      margin-top: 10px;
+      margin-bottom: 16px;
     }
     .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
     .section-title { font-size: 14px; font-weight: 900; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
     .badge-rcmd { font-size: 10px; font-weight: 800; color: var(--primary-gold); background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 6px; border-radius: 4px; }
-    .section-desc { font-size: 11.5px; color: var(--text-sub); margin-bottom: 12px; }
+    .section-desc { font-size: 12px; color: #fde68a; font-weight: 700; margin-bottom: 12px; }
 
     /* 실시간 상품 검색 바 */
     .search-box-wrap {
@@ -140,15 +139,6 @@
       border-radius: 12px;
       padding: 10px;
       margin-bottom: 12px;
-    }
-    .search-box-label {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #fde68a;
-      margin-bottom: 7px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
     .search-input-row {
       display: flex;
@@ -240,31 +230,10 @@
       object-fit: contain;
       padding: 2px;
     }
-    .api-prod-body {
-      flex: 1;
-      min-width: 0;
-    }
-    .api-prod-badges {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 3px;
-    }
-    .api-badge-rocket {
-      background: rgba(56, 189, 248, 0.2);
-      color: #38bdf8;
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-    .api-badge-free {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
+    .api-prod-body { flex: 1; min-width: 0; }
+    .api-prod-badges { display: flex; gap: 4px; margin-bottom: 3px; }
+    .api-badge-rocket { background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 9.5px; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
+    .api-badge-free { background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 9.5px; font-weight: 800; padding: 1px 5px; border-radius: 4px; }
     .api-prod-name {
       font-size: 12.5px;
       font-weight: 700;
@@ -276,11 +245,7 @@
       line-height: 1.3;
       margin-bottom: 3px;
     }
-    .api-prod-price {
-      font-size: 13.5px;
-      font-weight: 900;
-      color: #fbbf24;
-    }
+    .api-prod-price { font-size: 13.5px; font-weight: 900; color: #fbbf24; }
     .api-prod-go {
       background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
       color: #0b0f19;
@@ -319,6 +284,40 @@
       align-items: center;
     }
     .item-row:hover .btn-go { background: var(--primary-gold); color: #000; }
+
+    /* 3개 사이트 순환 배너 */
+    .cross-suite-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 15px 14px;
+    }
+    .cross-suite-title {
+      font-size: 13px;
+      font-weight: 900;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .cross-suite-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .cross-link-btn {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #0f1522;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 11px 10px;
+      text-decoration: none;
+      text-align: center;
+    }
+    .cross-link-btn:active { border-color: var(--primary-gold); }
+    .cross-link-btn strong { font-size: 12.5px; font-weight: 900; color: #fbbf24; margin-bottom: 3px; }
+    .cross-link-btn span { font-size: 11px; color: var(--text-sub); }
 
     /* 복사 완료 시 뜨는 행운 팝업 모달 */
     .modal-overlay {
@@ -399,7 +398,7 @@
       <p class="sub-title">역대 당첨 통계·합계·홀짝 비율 기반 5개 조합 자동 생성</p>
     </header>
 
-    <!-- 쿠팡 파트너스 필수 대가성 문구 (첫 부분 최상단 배치 · 본문보다 큰 고시인성 표기) -->
+    <!-- 쿠팡 파트너스 필수 대가성 문구 (최상단 배치) -->
     <div class="coupang-disclosure-top">
       <p>이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
     </div>
@@ -408,9 +407,7 @@
       🎲 이번 주 AI 추천 5조합 새로 추출하기
     </button>
 
-    <div class="set-list" id="setListContainer">
-      <!-- 5개 세트가 자바스크립트로 자동 생성됩니다 -->
-    </div>
+    <div class="set-list" id="setListContainer"></div>
 
     <button type="button" class="btn-copy-all" onclick="copyAllSets()">
       📋 추출된 5개 조합 전체 복사하기
@@ -422,41 +419,36 @@
         <div class="section-title">🍀 1등 기운을 담는 행운의 아이템</div>
         <span class="badge-rcmd">추천</span>
       </div>
-      <div class="section-desc">행운 부적 · 번호 보관 굿즈 및 쿠팡 실시간 최저가 검색</div>
+      <div class="section-desc">이번 주 행운템 & 주말 100% 로켓배송 생필품 최저가 찾기</div>
 
-      <!-- 쿠팡 실시간 상품 검색 박스 -->
       <div class="search-box-wrap">
-        <div class="search-box-label">🔍 행운 아이템 · 생필품 쿠팡 실시간 최저가 검색</div>
         <div class="search-input-row">
-          <input type="text" id="coupangKeyword" class="search-input" placeholder="쿠팡 상품 검색 (예: 24K순금카드, 황금지갑)" onkeypress="if(event.key==='Enter') searchCoupangProducts()">
+          <input type="text" id="coupangKeyword" class="search-input" placeholder="쿠팡 상품 검색 (예: 복권지갑, 해바라기액자, 삼다수)" onkeypress="if(event.key==='Enter') searchCoupangProducts()">
           <button type="button" class="btn-search" onclick="searchCoupangProducts()">🔍 검색</button>
         </div>
         <div class="keyword-chips">
-          <button type="button" class="chip-btn" onclick="quickSearch('24K순금카드')">#24K순금카드</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('행운부적')">#행운부적</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('황금지갑')">#황금지갑</button>
-          <button type="button" class="chip-btn" onclick="quickSearch('금전수화분')">#금전수화분</button>
           <button type="button" class="chip-btn" onclick="quickSearch('복권지갑')">#복권지갑</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('해바라기액자')">#해바라기액자</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('장지갑')">#장지갑</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('금전수화분')">#금전수화분</button>
+          <button type="button" class="chip-btn" onclick="quickSearch('삼다수2L')">#삼다수2L</button>
         </div>
 
-        <!-- 실시간 API 검색 결과 출력 영역 -->
         <div id="searchResultArea"></div>
       </div>
 
       <div class="item-list">
-        <!-- 1번 상품: 24K 순금 2달러 -->
         <a href="https://link.coupang.com/a/itDLVXK9jo" target="_blank" class="item-row">
           <div class="item-left">
             <span class="item-icon">💵</span>
             <div class="item-text">
-              <strong>지갑 속 24K 순금 행운의 2달러 카드</strong>
+              <strong>지갑 속 황금 행운의 2달러 카드</strong>
               <span>재물운과 1등 기운을 불러오는 황금 부적</span>
             </div>
           </div>
           <span class="btn-go">보러가기 ›</span>
         </a>
 
-        <!-- 2번 상품: 행운부적 -->
         <a href="https://link.coupang.com/a/itEnSlG8gS" target="_blank" class="item-row">
           <div class="item-left">
             <span class="item-icon">🧧</span>
@@ -466,6 +458,21 @@
             </div>
           </div>
           <span class="btn-go">보러가기 ›</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 3개 사이트 순환 배너 -->
+    <div class="cross-suite-box">
+      <div class="cross-suite-title">✨ STATLAB 무료 인기 분석기 바로가기</div>
+      <div class="cross-suite-grid">
+        <a href="https://jangaom80-blip.github.io/saju/" class="cross-link-btn">
+          <strong>🔮 신년 사주 재물운</strong>
+          <span>부족한 오행·개운법 진단</span>
+        </a>
+        <a href="https://jangaom80-blip.github.io/drive/" class="cross-link-btn">
+          <strong>🚗 카풀 차량비 정산</strong>
+          <span>유류비·경유지 1/N 계산</span>
         </a>
       </div>
     </div>
@@ -482,12 +489,10 @@
       </p>
 
       <div class="modal-links">
-        <!-- 팝업 내 1번 링크 -->
         <a href="https://link.coupang.com/a/itDLVXK9jo" target="_blank" onclick="closeLuckyModal()" class="btn-modal-link btn-gold">
-          <span>✨ 24K 순금 2달러 황금카드</span>
+          <span>✨ 행운의 2달러 황금카드</span>
           <span>보러가기 ↗</span>
         </a>
-        <!-- 팝업 내 2번 링크 -->
         <a href="https://link.coupang.com/a/itEnSlG8gS" target="_blank" onclick="closeLuckyModal()" class="btn-modal-link btn-amulet">
           <span>🧧 1등 기운 재물운 행운부적</span>
           <span>보러가기 ↗</span>
@@ -561,7 +566,6 @@
       }
     }
 
-    // 볼 색상 클래스 결정
     function getBallClass(num) {
       if (num <= 10) return 'ball-y';
       if (num <= 20) return 'ball-b';
@@ -570,7 +574,6 @@
       return 'ball-e';
     }
 
-    // 산술 복잡도(AC) 계산 수식
     function calculateAC(nums) {
       const diffs = new Set();
       for (let i = 0; i < nums.length; i++) {
@@ -581,7 +584,6 @@
       return diffs.size - (nums.length - 1);
     }
 
-    // 1개 세트 6개 번호 추출 (1~45 중복 제거 및 정렬)
     function pickOneSet() {
       const set = new Set();
       while (set.size < 6) {
@@ -590,7 +592,6 @@
       return Array.from(set).sort((a, b) => a - b);
     }
 
-    // 5개 세트 전체 생성 및 화면 렌더링
     function generateAllSets() {
       const setNames = ['A', 'B', 'C', 'D', 'E'];
       currentSets = [];
@@ -621,7 +622,6 @@
       });
     }
 
-    // 클립보드 번호 복사 및 팝업 모달 호출
     function copyAllSets() {
       if (currentSets.length === 0) generateAllSets();
 
@@ -657,7 +657,6 @@
       if (e.target === modal) closeLuckyModal();
     };
 
-    // 초기 실행
     generateAllSets();
   </script>
 </body>
